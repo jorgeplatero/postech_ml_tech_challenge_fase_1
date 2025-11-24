@@ -1,7 +1,7 @@
 [project]
 name = "postech-ml-techchallenge-fase-1"
 version = "0.1.0"
-description = "Tech challenge da fase 1 da pós graduação em machine learning engineering da FIAP"
+description = "Tech challenge fase 1 da pós graduação em machine learning engineering da FIAP"
 authors = [
     {name = "jorgeplatero",email = "jorge.platero@outlook.com"}
 ]
@@ -10,6 +10,10 @@ readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
 ]
+
+
+[tool.poetry]
+package-mode = false
 
 
 [build-system]
