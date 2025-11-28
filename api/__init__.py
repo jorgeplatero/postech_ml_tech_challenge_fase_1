@@ -1,0 +1,61 @@
+import logging
+from flask import Flask, jsonify
+from flask_jwt_extended import JWTManager
+from flasgger import Swagger
+from api.config.config import Config
+from api.models.__init__ import db
+from api.routes.auth import auth_bp, bcrypt
+from api.routes.health import health_bp
+
+
+def create_app():
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger('api')
+    
+    app = Flask(__name__)
+    app.config.from_object(Config)
+
+    #inicializa as extensões com o app
+    db.init_app(app)
+    jwt = JWTManager(app)
+    swagger = Swagger(app)
+    bcrypt.init_app(app) #inicialização da instância de bcrypt que está no auth.py
+
+    #tratamento de erros do JWT
+    @jwt.unauthorized_loader
+    def unauthorized_callback(callback):
+        if 'Missing' in str(callback) or 'Authorization header' in str(callback):
+            return jsonify({'msg': 'Token não informado'}), 401
+        return jsonify({'error': 'Erro de autenticação'}), 401
+
+    @jwt.invalid_token_loader
+    def invalid_token_callback(err):
+        logger.error(f'Erro de token inválido: {err}')
+        return jsonify({'error': 'Token inválido'}), 401
+
+    @jwt.expired_token_loader
+    def expired_token_callback(header, payload):
+        return jsonify({'error': 'Token expirado'}), 401
+
+    #registro de blueprints
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(health_bp)
+
+    #rota raiz
+    @app.route('/')
+    def home():
+        return jsonify({
+            'status': 'online',
+            'msg': 'Bem-vindo à API.' 
+        })
+
+    #criação das tabelas do db
+    with app.app_context():
+        try:
+            #o db.init_app(app) deve ser chamado antes desta linha
+            db.create_all() 
+            logger.info('Tabelas do banco de dados criadas/verificadas.')
+        except Exception as e:
+            logger.error('Erro crítico ao criar as tabelas do BD: %s', e)
+
+    return app

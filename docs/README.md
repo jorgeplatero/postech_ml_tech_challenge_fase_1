@@ -1,1 +1,1 @@
-# Tech challenge fase 1 da pós graduação em machine learning engineering da FIAP
+# Tech challenge fase 1 da pós-graduação em Machine Learning Engineering da FIAP
