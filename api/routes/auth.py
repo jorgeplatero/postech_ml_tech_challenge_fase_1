@@ -7,10 +7,10 @@ from api.models.users_access import UserAccess
 
 
 bcrypt = Bcrypt()
-#auth_bp = Blueprint('auth', __name__)
+auth_bp = Blueprint('auth', __name__)
 logger = logging.getLogger('api.auth')
 
-#@auth_bp.route('/register', methods=['POST'])
+@auth_bp.route('/register', methods=['POST'])
 def register_user(username, password):
     '''
     Registra um novo usuário.
