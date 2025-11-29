@@ -3,25 +3,26 @@ from flask import Flask, jsonify, Blueprint, request
 from flask_jwt_extended import JWTManager
 from flasgger import Swagger
 from sqlalchemy import inspect
+from flask_bcrypt import Bcrypt
 
+#CONFIG and AUTH
 from api.config.config import Config
-from api.models.__init__ import db
 from api.routes.auth import auth_bp
 from api.routes.health import health_bp
 from api.routes.categories import categories_bp
-
+from api.routes.books import books_bp
+#MODELS
 #Imports só para Inicializar o banco
+from api.models.__init__ import db
 from api.models import scrapper_data
 from api.models import users_access
+from api.models.user import User, get_user_by_username
 
 
-
-from flask_bcrypt import Bcrypt
-
-from api.models.user import db, User, get_user_by_username
-
+#ROUTES
 from api.routes.auth import register_user, login
 from api.routes.categories import model_all_categories
+from api.routes.books import model_all_books
 
 
 bcrypt = Bcrypt()
@@ -61,6 +62,7 @@ def create_app():
     app.register_blueprint(auth_bp, url_prefix='/v1')
     app.register_blueprint(health_bp, url_prefix='/v1')
     app.register_blueprint(categories_bp, url_prefix='/v1')
+    app.register_blueprint(books_bp, url_prefix='/v1')
 
     #rota raiz
     @app.route('/')
@@ -93,6 +95,10 @@ def create_app():
     @app.route('/categories', methods=['GET'])
     def categories_route():
         return model_all_categories()
+    
+    @app.route('/books', methods=['GET'])
+    def books_route():
+        return model_all_books()
     
 
     #criação das tabelas do db
