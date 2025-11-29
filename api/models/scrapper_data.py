@@ -42,3 +42,20 @@ def get_all_categories():
     except Exception as e:
         print(f"Erro ao buscar categrias: {e}")
         return None
+    
+def get_all_books():
+    try:
+
+        books = (
+
+            db.session.query(distinct(ScrapperBooks.title))
+            .order_by(ScrapperBooks.title.asc())
+            .all())
+
+        results = [{"book": c[0]} for c in books]
+
+        return results
+      
+    except Exception as e:
+        print(f"Erro ao buscar livros: {e}")
+        return None
