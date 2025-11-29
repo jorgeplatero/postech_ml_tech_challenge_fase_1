@@ -14,10 +14,14 @@ from api.models import scrapper_data
 from api.models import users_access
 
 
+
 from flask_bcrypt import Bcrypt
 
 from api.models.user import db, User, get_user_by_username
+
 from api.routes.auth import register_user, login
+from api.routes.categories import model_all_categories
+
 
 bcrypt = Bcrypt()
 auth_bp = Blueprint('auth', __name__)
@@ -83,6 +87,10 @@ def create_app():
         password = data['password']
 
         return register_user(username, password)
+    
+    @app.route('/categories', methods=['GET'])
+    def categories_route():
+        return model_all_categories()
     
 
     #criação das tabelas do db

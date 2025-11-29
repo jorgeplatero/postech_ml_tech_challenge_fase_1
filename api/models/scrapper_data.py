@@ -1,5 +1,6 @@
 import datetime
 from api.models.__init__ import db
+from sqlalchemy import distinct
 
 
 class ScrapperBooks(db.Model):
@@ -23,3 +24,21 @@ class ScrapperBooks(db.Model):
 
     def __repr__(self):
         return f'<Title {self.title}>'
+
+
+def get_all_categories():
+    try:
+
+        categories = (
+
+            db.session.query(distinct(ScrapperBooks.genre))
+            .order_by(ScrapperBooks.genre.asc())
+            .all())
+
+        results = [{"categories": c[0]} for c in categories]
+
+        return results
+    
+    except Exception as e:
+        print(f"Erro ao buscar categrias: {e}")
+        return None
