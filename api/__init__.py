@@ -6,8 +6,9 @@ from sqlalchemy import inspect
 
 from api.config.config import Config
 from api.models.__init__ import db
-#from api.routes.auth import auth_bp, bcrypt
+from api.routes.auth import auth_bp
 from api.routes.health import health_bp
+from api.routes.categories import categories_bp
 
 #Imports só para Inicializar o banco
 from api.models import scrapper_data
@@ -24,7 +25,7 @@ from api.routes.categories import model_all_categories
 
 
 bcrypt = Bcrypt()
-auth_bp = Blueprint('auth', __name__)
+#auth_bp = Blueprint('auth', __name__)
 logger = logging.getLogger('api.auth')
 
 def create_app():
@@ -59,6 +60,7 @@ def create_app():
     #registro de blueprints
     app.register_blueprint(auth_bp, url_prefix='/v1')
     app.register_blueprint(health_bp, url_prefix='/v1')
+    app.register_blueprint(categories_bp, url_prefix='/v1')
 
     #rota raiz
     @app.route('/')
