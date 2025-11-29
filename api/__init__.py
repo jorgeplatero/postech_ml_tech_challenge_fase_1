@@ -2,10 +2,15 @@ import logging
 from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
 from flasgger import Swagger
+from sqlalchemy import inspect
+
 from api.config.config import Config
 from api.models.__init__ import db
 from api.routes.auth import auth_bp, bcrypt
 from api.routes.health import health_bp
+
+#Importando Models
+from api.models import scrapper_data
 
 
 def create_app():
@@ -51,10 +56,10 @@ def create_app():
 
     #criação das tabelas do db
     with app.app_context():
-        try:
+        try: 
             #o db.init_app(app) deve ser chamado antes desta linha
             db.create_all() 
-            logger.info('Tabelas do banco de dados criadas/verificadas.')
+            logger.info(f'Tabelas do banco de dados criadas/verificadas. {inspect(db.engine).get_table_names()}')
         except Exception as e:
             logger.error('Erro crítico ao criar as tabelas do BD: %s', e)
 
