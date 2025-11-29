@@ -1,17 +1,27 @@
 import logging
-from flask import Flask, jsonify
+from flask import Flask, jsonify, Blueprint, request
 from flask_jwt_extended import JWTManager
 from flasgger import Swagger
 from sqlalchemy import inspect
 
 from api.config.config import Config
 from api.models.__init__ import db
-from api.routes.auth import auth_bp, bcrypt
+#from api.routes.auth import auth_bp, bcrypt
 from api.routes.health import health_bp
 
-#Importando Models
+#Imports só para Inicializar o banco
 from api.models import scrapper_data
+from api.models import users_access
 
+
+from flask_bcrypt import Bcrypt
+
+from api.models.user import db, User, get_user_by_username
+from api.routes.auth import register_user, login
+
+bcrypt = Bcrypt()
+auth_bp = Blueprint('auth', __name__)
+logger = logging.getLogger('api.auth')
 
 def create_app():
     logging.basicConfig(level=logging.INFO)
@@ -53,6 +63,27 @@ def create_app():
             'status': 'online',
             'msg': 'Bem-vindo à API.' 
         })
+    #@auth_bp.route('/login', methods=['POST'])
+    
+    @app.route('/login', methods=['POST'])
+    def login_route():
+        data = request.get_json(force=True)
+
+        username = data['username']
+        password = data['password']
+
+        return login(username, password)
+    
+
+    @app.route('/register', methods=['POST'])
+    def register_route():
+        data = request.get_json(force=True)
+
+        username = data['username']
+        password = data['password']
+
+        return register_user(username, password)
+    
 
     #criação das tabelas do db
     with app.app_context():
