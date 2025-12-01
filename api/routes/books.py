@@ -7,10 +7,9 @@ from flask_jwt_extended import jwt_required
 
 
 bcrypt = Bcrypt()
-books_bp = Blueprint('books', __name__)
 logger = logging.getLogger('api.auth')
 
-
+books_bp = Blueprint('books', __name__)
 @books_bp.route('/books', methods=['GET'])
 @jwt_required()
 def model_all_books():
