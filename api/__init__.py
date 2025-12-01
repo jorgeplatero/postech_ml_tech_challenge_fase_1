@@ -1,5 +1,5 @@
 import logging
-from flask import Flask, jsonify, Blueprint, request
+from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
 from flasgger import Swagger
 from sqlalchemy import inspect
@@ -14,15 +14,6 @@ from api.routes.books import books_bp
 #MODELS
 #Imports só para Inicializar o banco
 from api.models.__init__ import db
-from api.models import scrapper_data
-from api.models import users_access
-from api.models.user import User, get_user_by_username
-
-
-#ROUTES
-from api.routes.auth import register_user, login
-from api.routes.categories import model_all_categories
-from api.routes.books import model_all_books
 
 
 bcrypt = Bcrypt()
@@ -61,6 +52,7 @@ def create_app():
     #registro de blueprints
     app.register_blueprint(auth_bp, url_prefix='/v1')
     app.register_blueprint(health_bp, url_prefix='/v1')
+
     app.register_blueprint(categories_bp, url_prefix='/v1')
     app.register_blueprint(books_bp, url_prefix='/v1')
 
@@ -71,36 +63,7 @@ def create_app():
             'status': 'online',
             'msg': 'Bem-vindo à API.' 
         })
-    #@auth_bp.route('/login', methods=['POST'])
-    
-    @app.route('/login', methods=['POST'])
-    def login_route():
-        data = request.get_json(force=True)
-
-        username = data['username']
-        password = data['password']
-
-        return login(username, password)
-    
-
-    @app.route('/register', methods=['POST'])
-    def register_route():
-        data = request.get_json(force=True)
-
-        username = data['username']
-        password = data['password']
-
-        return register_user(username, password)
-    
-    @app.route('/categories', methods=['GET'])
-    def categories_route():
-        return model_all_categories()
-    
-    @app.route('/books', methods=['GET'])
-    def books_route():
-        return model_all_books()
-    
-
+  
     #criação das tabelas do db
     with app.app_context():
         try: 

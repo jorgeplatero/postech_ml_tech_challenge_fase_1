@@ -11,7 +11,7 @@ auth_bp = Blueprint('auth', __name__)
 logger = logging.getLogger('api.auth')
 
 @auth_bp.route('/register', methods=['POST'])
-def register_user(username, password):
+def register_user():
     '''
     Registra um novo usuário.
     ---
@@ -33,14 +33,14 @@ def register_user(username, password):
             description: Usuário já existe
     '''
 
-    #data = request.get_json(force=True)
+    data = request.get_json(force=True)
 
-    if get_user_by_username(username):
+    if get_user_by_username(data['username']):
         return jsonify({'error': 'Usuário já existe'}), 400
     try:
         # hashed_password = bcrypt.generate_password_hash(password.decode('utf-8'))
-        hashed_password = bcrypt.generate_password_hash(password) # Retirei o decode('utf-8') porque já é uma string
-        new_user = User(username=username, password=hashed_password)
+        hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
+        new_user = User(username=data['username'], password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
     except Exception as e:
@@ -49,8 +49,8 @@ def register_user(username, password):
         return jsonify({'error': 'Erro interno ao registrar usuário'}), 500
     return jsonify({'msg': 'Usuário criado com sucesso'}), 201
 
-#@auth_bp.route('/login', methods=['POST'])
-def login(username, password):
+@auth_bp.route('/login', methods=['POST'])
+def login():
     '''
     Gera um token JWT para autenticação.
     ---
@@ -78,18 +78,11 @@ def login(username, password):
             description: Credenciais inválidas
     '''
     
-    user = get_user_by_username(username)
-    if user and bcrypt.check_password_hash(user.password, password):
-        access_token = create_access_token(identity=str(user.id))
+    data = request.get_json(force=True)
 
-        # Salvando acessos do Usuário
-        new_acess = UserAccess(
-            username = username,
-            token    = access_token)
-        
-        db.session.add(new_acess)
-        db.session.commit()
-
-        return jsonify({'access_token': access_token}), 200
+    user = get_user_by_username(data['username'])
     
+    if user and bcrypt.check_password_hash(user.password, data['password']):
+        access_token = create_access_token(identity=str(user.id))
+        return jsonify({'access_token': access_token}), 200
     return jsonify({'error': 'Credenciais inválidas'}), 401

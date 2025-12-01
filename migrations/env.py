@@ -6,7 +6,7 @@ from sqlalchemy import pool
 from alembic import context
 from api.models.__init__ import db
 from api.models import *
-from app import app
+
 
 
 # this is the Alembic Config object, which provides
